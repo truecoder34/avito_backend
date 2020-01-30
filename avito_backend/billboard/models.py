@@ -1,9 +1,8 @@
 from django.db import models
 import uuid
-# Create your models here.
 
 #base model-will not be created in db
-class Entity(models.Model):
+class ORMEntity(models.Model):
     id = models.UUIDField(primary_key=True,
                           default=uuid.uuid4,
                           editable=False)
@@ -15,7 +14,7 @@ class Entity(models.Model):
         abstract = True
 
 
-class Advertisement(Entity):
+class ORMAdvertisement(ORMEntity):
     title = models.CharField(blank=False,
                              max_length=200,
                              verbose_name="Advertisement title")
@@ -27,9 +26,15 @@ class Advertisement(Entity):
 
     class Meta:
         ordering = ['datetime_create']
+        verbose_name = 'Advertisement'
+        verbose_name_plural = 'Advertisements'
 
-class PhotoLinks(Entity):
-    advertisement = models.ForeignKey(Advertisement,
+#models.signals.post_delete.connect(pre_delete_delete_callback, sender=ORMAdvertisement)
+
+
+class ORMPhotoLinks(ORMEntity):
+    advertisement = models.ForeignKey(ORMAdvertisement,
+                                      null=True,
                                       on_delete=models.CASCADE)
     photo_link = models.CharField(blank=False,
                                   max_length=500,
@@ -38,3 +43,9 @@ class PhotoLinks(Entity):
 
     def __str__(self):
         return "%s link to advertisement %s" % (self.id, self.advertisement)
+
+    class Meta:
+        verbose_name = 'PhotoLink'
+        verbose_name_plural = 'PhotoLinks'
+
+
